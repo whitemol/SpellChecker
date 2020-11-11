@@ -1,8 +1,6 @@
 #include "simplehashdict.h"
 #include "dictutils.h"
 
-#include <dictutils.h>
-
 #include <algorithm>
 
 

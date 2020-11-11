@@ -114,7 +114,7 @@ SimpleDictionaryNoNearEdits::getCorrectionsIdx(
         const Mask& mask) const
 {
     Mask corr_idx;
-    corr_idx.resize(word.size() + 1, 0); 
+    corr_idx.resize(word.size() + 1, 0);
     if (!mask.empty()) {
         Mask mask_sorted{mask};
 
