@@ -48,7 +48,7 @@ void SimpleDictChecker::edits(const DictionaryPtr dictionary,
     }
     for (std::string::size_type i = 0;i < word.size() - 1;i++) {
         word_edits.push_back(word.substr(0, i)
-                             + word[i + 1] + word[i]
+                             + word.at(i + 1) + word.at(i)
                              + word.substr(i + 2)); //transposition
     }
     for (const auto& j: dictionary->getAlphabet()) {
@@ -68,8 +68,8 @@ void SimpleDictChecker::known(const DictionaryPtr dictionary,
                               DictMap& candidates) const
 {
     for (unsigned int i = 0;i < words.size();i++) {
-        if (dictionary->contain(words[i])) {
-            candidates[words[i]]++;
+        if (dictionary->contain(words.at(i))) {
+            candidates[words.at(i)]++;
         }
     }
 }

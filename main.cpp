@@ -44,8 +44,16 @@ void testSpellChecker(StringInStdOut& io_modul,
                       SpellCheckerPtr checker,
                       const std::string& text)
 {
+    std::cout << std::endl << std::endl 
+              << "Example: " 
+              << std::endl << std::endl
+              << text 
+              << std::endl ;
     io_modul.setText(text);
     checker->createDict(io_modul.getDict());
+    std::cout << std::endl << std::endl 
+              << "Correction: " 
+              << std::endl << std::endl;
     io_modul.output(checker->correctText(io_modul.getText()));
 }
 

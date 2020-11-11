@@ -114,7 +114,7 @@ SimpleDictionaryNoNearEdits::getCorrectionsIdx(
         const Mask& mask) const
 {
     Mask corr_idx;
-    corr_idx.resize(word.size(), 0);
+    corr_idx.resize(word.size() + 1, 0); 
     if (!mask.empty()) {
         Mask mask_sorted{mask};
 
@@ -125,14 +125,14 @@ SimpleDictionaryNoNearEdits::getCorrectionsIdx(
         int sum = 0;
         for (int i = 0, j = 0; i < static_cast<int>(corr_idx.size());) {
             if (j != static_cast<int>(mask_sorted.size())) {
-                if ((i+1) >= std::abs(mask_sorted[j])) {
-                    sum += boost::math::sign(mask_sorted[j]);
+                if ((i+1) >= std::abs(mask_sorted.at(j))) {
+                    sum += boost::math::sign(mask_sorted.at(j));
                     j++;
-                    corr_idx[i] = sum;
+                    corr_idx.at(i) = sum;
                     continue;
                 }
             }
-            corr_idx[i] = sum;
+            corr_idx.at(i) = sum;
             i++;
         }
     }
@@ -150,7 +150,7 @@ void SimpleDictionaryNoNearEdits::edits(
     auto corr_idx = getCorrectionsIdx(word, mask);
 
     for (std::string::size_type i = 0;i < word.size(); i++) {
-        if (allowedDeletions(mask, i, corr_idx[i])) {
+        if (allowedDeletions(mask, i, corr_idx.at(i))) {
             auto new_mask = Mask(mask);
             new_mask.push_back(-static_cast<int>(i+1));
             word_edits.push_back(
@@ -162,7 +162,7 @@ void SimpleDictionaryNoNearEdits::edits(
 
     for (const auto& j: dictionary->getAlphabet()) {
         for (std::string::size_type i = 0;i < word.size() + 1;i++) {
-          if (allowedInsertions(mask, i, corr_idx[i])) {
+          if (allowedInsertions(mask, i, corr_idx.at(i))) {
               auto new_mask = Mask(mask);
               new_mask.push_back(static_cast<int>(i+1));
               word_edits.push_back(
@@ -180,7 +180,7 @@ void SimpleDictionaryNoNearEdits::known(
         DictMap& candidates) const
 {
     for (unsigned int i = 0;i < words.size();i++) {
-        auto& word = words[i].first;
+        auto& word = words.at(i).first;
 
         if (dictionary->contain(word)) {
             candidates[word]++;

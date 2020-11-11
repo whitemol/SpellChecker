@@ -1,6 +1,7 @@
 #include "basesimpledictchecker.h"
 
 #include <algorithm>
+#include <functional>
 
 BaseSimpleDictChecker::BaseSimpleDictChecker(const size_t num_edits):
         DictChecker(), num_edits{num_edits}

@@ -22,7 +22,7 @@ std::string SimpleParser::packWord(std::vector<std::string>& words,
     if (words.empty()) {
         result = "{ " + word + "? }";
     } else if (words.size() == 1) {
-        result = words[0];
+        result = words.at(0);
     } else {
         result = "{" + concatWithSpace(words) + " }";
     }
@@ -92,8 +92,8 @@ std::string SimpleParserWithSavedSpaces::packText(
     std::string result;
     if ((words.size() + 1) == saved_spaces.size()) {
         for (size_t i = 0, j = 0; i < words.size(); ++i, ++j) {
-            result += saved_spaces[i];
-            result += words[i];
+            result += saved_spaces.at(i);
+            result += words.at(i);
         }
     } else { // if smth go wrond
         // TODO: add info about it
