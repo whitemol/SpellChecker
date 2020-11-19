@@ -20,7 +20,7 @@ std::vector<std::string> SimpleDictionaryNoNearEdits::correctionSuggestions(
     }
 
     VectorStr result;
-    VectorStrPair edited_words, prev_edits, word_storage;
+    ListStrPair edited_words, prev_edits, word_storage;
     DictMap candidates;
 
     if (dictionary->contain(word)) {
@@ -139,10 +139,9 @@ SimpleDictionaryNoNearEdits::getCorrectionsIdx(
     return  corr_idx;
 }
 
-void SimpleDictionaryNoNearEdits::edits(
-        const DictionaryPtr dictionary,
-        const PairStrVec& word_pair,
-        VectorStrPair& word_edits) const
+void SimpleDictionaryNoNearEdits::edits(const DictionaryPtr dictionary,
+        const PairStrMask& word_pair,
+        ListStrPair& word_edits) const
 {
     auto& word = word_pair.first;
     auto& mask = word_pair.second;
@@ -176,14 +175,116 @@ void SimpleDictionaryNoNearEdits::edits(
 
 void SimpleDictionaryNoNearEdits::known(
         const DictionaryPtr dictionary,
-        const VectorStrPair& words,
+        const ListStrPair& words,
         DictMap& candidates) const
 {
-    for (unsigned int i = 0;i < words.size();i++) {
-        auto& word = words.at(i).first;
-
+//    for (unsigned int i = 0;i < words.size();i++) {
+//        auto& word = words.at(i).first;
+//        if (dictionary->contain(word)) {
+//            candidates[word]++;
+//        }
+//    }
+    for (const auto& wordp: words) {
+        auto& word = wordp.first;
         if (dictionary->contain(word)) {
             candidates[word]++;
         }
     }
+}
+
+std::vector<std::string>
+SimpleDictionaryNoNearEditsLowMem::correctionSuggestions(
+        const DictionaryPtr dictionary,
+        const std::string& word) const
+{
+    if (!DictUtils::isAllAlpha(word)){
+        return VectorStr{};
+    }
+
+    VectorStr result;
+    ListStrPair edited_words, prev_edits, word_storage;
+    DictMap candidates;
+
+    if (dictionary->contain(word)) {
+        return VectorStr{word};
+    }
+
+    std::vector<bool> case_mask;
+    if (save_case) {
+        case_mask = DictUtils::getCaseMask(word);
+    }
+
+    PairStrMask word_p = std::make_pair(word, Mask{});
+    word_p.second.resize(word.size() + 1);
+    candidates = generateNewEditsAndCheck(word_p, candidates, dictionary, 0);
+
+    // TODO: ovverite candatate for num of edits control
+    if (candidatesCheck(dictionary, candidates, result)) {
+        if (save_case) {
+            std::transform(result.begin(), result.end(), result.begin(),
+                           [&case_mask](auto& v) {
+                return DictUtils::applyCaseMask(v, case_mask);
+            });
+        }
+        return result;
+    }
+
+    return VectorStr{};
+}
+
+SimpleDictionaryNoNearEditsLowMem::DictMap
+SimpleDictionaryNoNearEditsLowMem::generateNewEditsAndCheck(
+        PairStrMask& word_p,
+        DictMap& candidates,
+        const DictionaryPtr dictionary,
+        const size_t& num_iter) const
+{
+    auto& word = word_p.first;
+    auto& mask = word_p.second;
+
+    auto corr_idx = getCorrectionsIdx(word, mask);
+
+    //deletions
+    for (std::string::size_type i = 0;i < word.size(); i++) {
+        if (allowedDeletions(mask, i, corr_idx.at(i))) {
+            auto new_mask = Mask(mask);
+            new_mask.push_back(-static_cast<int>(i+1));
+            auto new_word_p = std::make_pair(word.substr(0, i)
+                                             + word.substr(i + 1),
+                                             new_mask);
+            if (dictionary->contain(word)) {
+                candidates[word]++;
+            }
+            if (num_iter < num_edits) {
+                generateNewEditsAndCheck(new_word_p,
+                                         candidates,
+                                         dictionary,
+                                         num_iter + 1);
+            }
+        }
+    }
+
+    //insertion
+    for (const auto& j: dictionary->getAlphabet()) {
+        for (std::string::size_type i = 0;i < word.size() + 1;i++) {
+          if (allowedInsertions(mask, i, corr_idx.at(i))) {
+              auto new_mask = Mask(mask);
+              new_mask.push_back(static_cast<int>(i+1));
+              auto new_word_p = std::make_pair(word.substr(0, i) + j
+                                               + word.substr(i),
+                                               new_mask);
+              if (dictionary->contain(word)) {
+                  candidates[word]++;
+              }
+              if (num_iter < num_edits) {
+                  generateNewEditsAndCheck(new_word_p,
+                                           candidates,
+                                           dictionary,
+                                           num_iter + 1);
+              }
+          }
+       }
+    }
+
+    return candidates;
 }

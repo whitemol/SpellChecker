@@ -1,10 +1,9 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.10)
 
 project(SpellChecker VERSION 0.1)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-
 
 set(SOURCES
     SpellChecker/spellchecker.cpp
@@ -15,7 +14,7 @@ set(SOURCES
     Parser/simpleparser.cpp
     Utils/dictutils.cpp
     DictChecker/simpledictchecker.cpp
-    Dict/simplehashdict.cpp
+    Dict/simplemapdict.cpp
     IOModul/iomodul.cpp
     Parser/parser.cpp
     main.cpp

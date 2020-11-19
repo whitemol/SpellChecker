@@ -4,6 +4,8 @@
 #include <dictchecker.h>
 
 #include <map>
+#include <list>
+#include <vector>
 
 //! Base interface for checking word by the iteration.
 //! In one iteration, assumptions are made about the word and checked for
@@ -21,6 +23,8 @@ public:
 
 protected:
 
+    // TODO remove DictMap here
+    using ListStr = std::list<std::string>;
     using VectorStr = std::vector<std::string>;
     using DictMap = std::map<std::string, int>;
 

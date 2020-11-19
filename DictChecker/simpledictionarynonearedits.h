@@ -24,8 +24,8 @@ protected:
 
     // vector<int> contatin +(idx+1) for insertions and -(idx+1) for deletions
     using Mask = std::vector<int>;
-    using PairStrVec = std::pair<std::string, Mask>;
-    using VectorStrPair = std::vector<PairStrVec>;
+    using PairStrMask = std::pair<std::string, Mask>;
+    using ListStrPair = std::list<PairStrMask>;
 
     bool save_case;
 
@@ -47,13 +47,30 @@ protected:
     //! Generate edits of word with checking of
     //! allowedInsertions and allowedDeletions
     virtual void edits(const DictionaryPtr dictionary,
-                       const PairStrVec& word_pair,
-                       VectorStrPair& word_edits) const;
+                       const PairStrMask& word_pair,
+                       ListStrPair& word_edits) const;
 
     //! Check edits of word
     virtual void known(const DictionaryPtr dictionary,
-                       const VectorStrPair& words,
+                       const ListStrPair& words,
                        DictMap& candidates) const;
+};
+
+class SimpleDictionaryNoNearEditsLowMem: public SimpleDictionaryNoNearEdits
+{
+    //! See DictChecker::correctionSuggestions
+    std::vector<std::string> correctionSuggestions(
+            const DictionaryPtr dictionary,
+            const std::string& word) const override;
+
+protected:
+
+    virtual DictMap generateNewEditsAndCheck(PairStrMask& word_p,
+                                             DictMap& candidates,
+                                             const DictionaryPtr dictionary,
+                                             const size_t& num_iter) const;
+
+
 };
 
 #endif // SIMPLEDICTIONARYNONEAREDITS_H

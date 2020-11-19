@@ -22,11 +22,11 @@ protected:
     //! Generate edits of word
     virtual void edits(const DictionaryPtr dictionary,
                        const std::string& word,
-                       VectorStr& word_edits) const;
+                       ListStr& word_edits) const;
 
     //! Check edits of word
     virtual void known(const DictionaryPtr dictionary,
-                       const VectorStr& words,
+                       const ListStr& words,
                        DictMap& candidates) const;
 
 };
@@ -42,7 +42,7 @@ public:
 
     virtual void edits(const DictionaryPtr dictionary,
                        const std::string& word,
-                       std::vector<std::string>& word_edits) const override;
+                       std::list<std::string>& word_edits) const override;
 };
 
 #endif // SIMPLEDICTCHECKER_H

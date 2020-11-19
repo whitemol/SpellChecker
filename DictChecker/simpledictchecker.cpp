@@ -9,7 +9,8 @@ std::vector<std::string> SimpleDictChecker::correctionSuggestions(
         const DictionaryPtr dictionary,
         const std::string& word) const
 {
-    VectorStr result, edited_words, prev_edits, word_storage;
+    VectorStr result;
+    ListStr edited_words, prev_edits, word_storage;
     DictMap candidates;
 
     if (dictionary->contain(word)) {
@@ -18,9 +19,9 @@ std::vector<std::string> SimpleDictChecker::correctionSuggestions(
 
     prev_edits.push_back(word);
     for (size_t iteration = 0; iteration < num_edits; iteration++) {
-//      word_storage = VectorStr{}; // TODO std::optional<>
+//      word_storage = ListStr{}; // TODO std::optional<>
         for (const auto& word_v: prev_edits) {
-//          edited_words = VectorStr{}; // TODO std::optional<>
+//          edited_words = ListStr{}; // TODO std::optional<>
 
             edits(dictionary, word_v, edited_words);
             known(dictionary, edited_words, candidates);
@@ -40,7 +41,7 @@ std::vector<std::string> SimpleDictChecker::correctionSuggestions(
 
 void SimpleDictChecker::edits(const DictionaryPtr dictionary,
                               const std::string& word,
-                              VectorStr& word_edits) const
+                              ListStr& word_edits) const
 {
     for (std::string::size_type i = 0;i < word.size(); i++) {
         word_edits.push_back(word.substr(0, i)
@@ -64,12 +65,17 @@ void SimpleDictChecker::edits(const DictionaryPtr dictionary,
 }
 
 void SimpleDictChecker::known(const DictionaryPtr dictionary,
-                              const VectorStr& words,
+                              const ListStr& words,
                               DictMap& candidates) const
 {
-    for (unsigned int i = 0;i < words.size();i++) {
-        if (dictionary->contain(words.at(i))) {
-            candidates[words.at(i)]++;
+//    for (unsigned int i = 0;i < words.size();i++) {
+//        if (dictionary->contain(words.at(i))) {
+//            candidates[words.at(i)]++;
+//        }
+//    }
+    for (const auto& word: words) {
+        if (dictionary->contain(word)) {
+            candidates[word]++;
         }
     }
 }
@@ -79,10 +85,9 @@ SimpleDictCheckerNoAlterNoTransp::SimpleDictCheckerNoAlterNoTransp(const size_t 
 {}
 
 
-void SimpleDictCheckerNoAlterNoTransp::edits(
-        const DictionaryPtr dictionary,
+void SimpleDictCheckerNoAlterNoTransp::edits(const DictionaryPtr dictionary,
         const std::string& word,
-        std::vector<std::string>& word_edits) const
+        std::list<std::string>& word_edits) const
 {
     for (std::string::size_type i = 0;i < word.size(); i++) {
         word_edits.push_back(word.substr(0, i)
